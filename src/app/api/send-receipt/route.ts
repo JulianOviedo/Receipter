@@ -30,27 +30,33 @@ export async function POST (req: NextRequest) {
     return Response.json({ error: 'El email no fue proporcionado' }, { status: 400 })
   }
 
-  // Crea el contenido del correo electrónico
+  if (receipt && receipt instanceof Blob) {
+    // Convierte el archivo a un array buffer y luego a un buffer de Node.js
+    const arrayBuffer = await receipt.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
 
-  try {
-    // Enviar el correo
-    const info = await transporter.sendMail({
-      from: process.env.GMAIL_USER, // Dirección de correo de envío
-      to: email, // Dirección de destino
-      subject: 'Hello world', // Asunto del correo
-      html: '<p>hello world</p>', // Contenido del correo en HTML
-      attachments: [
-        {
-          filename: 'receipt.pdf'
-          // content: receipt
-        }
-      ]
-    })
+    try {
+      const info = await transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to: email,
+        subject: 'Hello world',
+        html: '<p>hello world</p>',
+        attachments: [
+          {
+            filename: 'receipt.pdf',
+            content: buffer,
+            contentType: 'application/pdf'
+          }
+        ]
+      })
 
-    console.log('Correo enviado:', info.response)
-    return Response.json({ message: 'Correo enviado exitosamente' })
-  } catch (error) {
-    console.error('Error al enviar correo:', error)
-    return Response.json({ error: 'Error al enviar correo' }, { status: 500 })
+      console.log('Correo enviado:', info.response)
+      return Response.json({ message: 'Correo enviado exitosamente' })
+    } catch (error) {
+      console.error('Error al enviar correo:', error)
+      return Response.json({ error: 'Error al enviar correo' }, { status: 500 })
+    }
+  } else {
+    return Response.json({ error: 'El archivo no es válido o no fue proporcionado' }, { status: 400 })
   }
 }
