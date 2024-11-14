@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server'
 import prisma from '../../../../lib/prismaClient'
 import { Employee } from '@prisma/client'
 
+// Deshabilitar el bodyParser de Next.js
+export const config = {
+  api: {
+    bodyParser: false
+  }
+}
+
 export async function GET () {
   try {
     const employees: Employee[] = await prisma.employee.findMany()

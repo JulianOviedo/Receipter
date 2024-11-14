@@ -1,6 +1,6 @@
 'use client'
-import { getEmployees } from '@/utils/CRUD/getEmployees';
-import { Employee } from '@prisma/client';
+import { getEmployees } from '@/utils/CRUD/getEmployees'
+import { Employee } from '@prisma/client'
 import React, { useEffect, useState } from 'react'
 
 export default function Home () {
@@ -9,29 +9,56 @@ export default function Home () {
 
   useEffect(() => {
     const fetchEmployees = async () => {
-      const employeesData = await getEmployees(); // Llamada a la API
-      setEmployees(employeesData); // Establecer el estado con los empleados
-    };
+      const employeesData = await getEmployees() // Llamada a la API
+      setEmployees(employeesData) // Establecer el estado con los empleados
+    }
 
-    fetchEmployees();
-  }, []);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    fetchEmployees()
+  }, [])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
-    if ((files != null) && files.length > 0) {
+    if (files && files.length > 0) {
       setSelectedFiles(Array.from(files))
-
-      Array.from(files).forEach((file) => {
-        const match = file.name.match(/(\d+)\.PDF$/i)
-
-        const legajo = match ? parseInt(match[1], 10) : null
-        console.log(legajo)
-      })
     }
+    console.log(selectedFiles)
   }
 
-  const handleSendReceipts = () => {
-    console.log('Sending receipts...')
+  const handleSendReceipts = async () => {
+    for (const file of selectedFiles) {
+      // Extraer el legajo del nombre del archivo
+      const match = file.name.match(/(\d+)\.PDF$/i)
+      const legajo = match ? parseInt(match[1], 10) : null
+
+      if (legajo) {
+        // Buscar el empleado con el legajo correspondiente
+        const employee = employees.find((emp) => emp.legajo === legajo)
+        console.log(employee)
+
+        if (employee?.email) {
+          // Crear un FormData para enviar el archivo
+          const formData = new FormData()
+          formData.append('file', file)
+          formData.append('email', employee.email)
+
+          try {
+            const response = await fetch('/api/send-receipt', {
+              method: 'POST',
+              body: formData
+            })
+
+            if (!response.ok) {
+              console.error('Error al enviar el recibo:', response.statusText)
+            } else {
+              console.log(`Recibo enviado a ${employee.email}`)
+            }
+          } catch (error) {
+            console.error('Error al enviar el recibo:', error)
+          }
+        }
+      }
+    }
   }
 
   return (
@@ -88,7 +115,7 @@ export default function Home () {
       )}
 
       <h1>Employees</h1>
-      {employees && employees.map(({id, name, email}) => (
+      {employees && employees.map(({ id, name, email }) => (
         <div key={id}>
           <p>{name}</p>
           <p>{email}</p>
