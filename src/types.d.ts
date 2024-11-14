@@ -1,8 +1,9 @@
 export interface Employee {
-  id: string
+  id?: string
   legajo: number
-  name: string | null
-  email: string | null
-  createdAt: Date
-  updatedAt: Date
+  name: string
+  lastName: string
+  email: string
+  createdAt?: Date
+  updatedAt?: Date
 }

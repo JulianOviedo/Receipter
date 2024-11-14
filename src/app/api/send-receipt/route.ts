@@ -1,14 +1,13 @@
 import nodemailer from 'nodemailer'
 import { NextRequest } from 'next/server'
 
-// Crea un transporter utilizando el servicio SMTP de Gmail
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com', // Usamos Gmail
-  port: 465, // Puerto para SSL
-  secure: true, // Usamos SSL
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
-    user: process.env.GMAIL_USER, // Tu correo de Gmail
-    pass: process.env.GMAIL_PASS // Tu contraseña de aplicación (ver más abajo)
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS
   },
   tls: {
     rejectUnauthorized: false
@@ -17,7 +16,7 @@ const transporter = nodemailer.createTransport({
 
 transporter.verify().then(() => {
   console.log('Ready for send emails')
-})
+}).catch(err => console.error(err))
 
 export async function POST (req: NextRequest) {
   const formData = await req.formData()
@@ -31,7 +30,6 @@ export async function POST (req: NextRequest) {
   }
 
   if (receipt && receipt instanceof Blob) {
-    // Convierte el archivo a un array buffer y luego a un buffer de Node.js
     const arrayBuffer = await receipt.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 

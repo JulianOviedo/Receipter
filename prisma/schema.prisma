@@ -33,6 +33,7 @@ model Employee {
   id            String       @default(cuid()) @id
   legajo        Int    @unique
   name          String?
+  lastName      String?
   email         String?   @unique
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
