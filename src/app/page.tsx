@@ -1,23 +1,23 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 'use client'
 import { getEmployees } from '@/utils/CRUD/getEmployees'
 import { Employee } from '@prisma/client'
 import React, { useEffect, useState } from 'react'
-import SkeletonEmployees from './components/EmployeeSkeleton'
 import { Title } from './components/Title'
 import AddEmployeeForm from './components/AddEmployeeForm'
 import { ReceiptInput } from './components/ReceiptInput'
+import { EmployeeList } from './components/EmployeeList'
 
 export default function Home () {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [employees, setEmployees] = useState<Employee[]>([])
 
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      const employeesData = await getEmployees()
-      setEmployees(employeesData)
-    }
+  const fetchEmployees = async () => {
+    const employeesData = await getEmployees()
+    setEmployees(employeesData)
+  }
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  useEffect(() => {
     fetchEmployees()
   }, [])
 
@@ -65,26 +65,17 @@ export default function Home () {
   }
 
   return (
-    <main className="grid grid-cols-2 gap-8 w-full h-full items-center justify-items-center p-5">
+    <main className="grid grid-cols-[400px_auto] gap-8 w-full h-full items-center justify-items-center p-5">
       <div>
         <Title
           title="CEFTY RECEIPT GUN"
           subtitle="Please add here the receipts you want to deliver"
         />
         <ReceiptInput handleFileChange={handleFileChange} selectedFiles={selectedFiles}/>
-        <AddEmployeeForm />
+        <AddEmployeeForm refetchEmployees={fetchEmployees} />
       </div>
-
       <div>
-        {employees.length === 0 && <SkeletonEmployees />}
-        <Title title="Your Employees" component="h2" />
-        {employees?.map(({ id, name, email }) => (
-          <div key={id}>
-            <p>{name}</p>
-            <p>{email}</p>
-          </div>
-        ))}
-
+        <EmployeeList employees={employees}/>
         <button onClick={handleSendReceipts}>SHOT</button>
       </div>
     </main>

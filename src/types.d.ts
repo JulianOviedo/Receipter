@@ -1,9 +1,6 @@
-export interface Employee {
-  id?: string
-  legajo: number
-  name: string
-  lastName: string
+export interface EmployeeFormData {
+  fullName: string
+  cuil: string
   email: string
-  createdAt?: Date
-  updatedAt?: Date
+  legajo: number
 }

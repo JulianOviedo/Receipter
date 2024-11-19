@@ -1,11 +1,16 @@
-import { Employee } from '@/types'
+import { EmployeeFormData } from '@/types'
 import { addEmployee } from '@/utils/CRUD/addEmployee'
 import React, { useState } from 'react'
+import { Title } from './Title'
 
-export const AddEmployeeForm: React.FC = () => {
-  const [formData, setFormData] = useState<Employee>({
-    name: '',
-    lastName: '',
+interface Props {
+  refetchEmployees: () => Promise<void>
+}
+
+export const AddEmployeeForm: React.FC<Props> = ({ refetchEmployees }) => {
+  const [formData, setFormData] = useState<EmployeeFormData>({
+    fullName: '',
+    cuil: '',
     email: '',
     legajo: 0
   })
@@ -28,8 +33,10 @@ export const AddEmployeeForm: React.FC = () => {
 
     try {
       await addEmployee(formData)
+      await refetchEmployees()
       alert('Employee added successfully!')
     } catch (error) {
+      console.log(error)
       setError('Failed to add employee. Please try again.')
     } finally {
       setIsSubmitting(false)
@@ -39,18 +46,19 @@ export const AddEmployeeForm: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-[600px] flex flex-col items-center gap-5"
+      className="w-full flex flex-col items-center gap-5"
     >
+      <Title title='Add Employee' component='h2'/>
       <div className="w-full">
         <label
-          htmlFor="name"
+          htmlFor="fullName"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
-          Name
+          Full Name
         </label>
         <input
-          id="name"
-          value={formData.name}
+          id="fullName"
+          value={formData.fullName}
           onChange={handleChange}
           className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           required
@@ -58,14 +66,15 @@ export const AddEmployeeForm: React.FC = () => {
       </div>
       <div className="w-full">
         <label
-          htmlFor="lastName"
+          htmlFor="cuil"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
           Last Name
         </label>
         <input
-          id="lastName"
-          value={formData.lastName}
+          type='number'
+          id="cuil"
+          value={formData.cuil}
           onChange={handleChange}
           className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           required

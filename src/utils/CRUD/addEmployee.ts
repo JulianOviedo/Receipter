@@ -1,6 +1,6 @@
-import { Employee } from '@/types'
+import { EmployeeFormData } from '@/types'
 
-export const addEmployee = async (employee: Employee): Promise<Response> => {
+export const addEmployee = async (employee: EmployeeFormData): Promise<Response> => {
   try {
     const response = await fetch('http://localhost:3000/api/add-employee', {
       method: 'POST',
