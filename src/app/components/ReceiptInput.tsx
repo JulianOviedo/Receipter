@@ -5,7 +5,7 @@ interface Props {
 
 export const ReceiptInput: React.FC<Props> = ({ handleFileChange, selectedFiles }) => {
   return (
-        <div className="flex items-center justify-center w-full my-10 flex-col">
+        <div className="flex items-center justify-center w-[600px] my-10 flex-col">
           <label
             className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500"
             htmlFor="dropzone-file"
@@ -45,7 +45,7 @@ export const ReceiptInput: React.FC<Props> = ({ handleFileChange, selectedFiles 
           </label>
           {selectedFiles.length > 0 && (
           <div className="flex flex-col items-center mt-4">
-            <p className="text-sm text-green-600 dark:text-green-400">
+            <p className="text-sm text-green-900 dark:text-green-400">
               {selectedFiles.length} archivo(s) subido(s) correctamente
             </p>
           </div>

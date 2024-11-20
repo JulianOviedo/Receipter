@@ -1,30 +1,23 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 'use client'
-import { getEmployees } from '@/utils/CRUD/getEmployees'
-import { Employee } from '@prisma/client'
-import React, { useEffect, useState } from 'react'
-import { Title } from './components/Title'
-import AddEmployeeForm from './components/AddEmployeeForm'
+import React, { useState } from 'react'
 import { ReceiptInput } from './components/ReceiptInput'
-import { EmployeeList } from './components/EmployeeList'
+import toast from 'react-hot-toast'
+import { useEmployees } from './context'
+import Footer from './components/Footer'
 
 export default function Home () {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
-  const [employees, setEmployees] = useState<Employee[]>([])
-
-  const fetchEmployees = async () => {
-    const employeesData = await getEmployees()
-    setEmployees(employeesData)
-  }
-
-  useEffect(() => {
-    fetchEmployees()
-  }, [])
+  const { employees } = useEmployees()
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (files && files.length > 0) {
       setSelectedFiles(Array.from(files))
+      toast.success('Files uploaded successfully!', {
+        duration: 3000,
+        position: 'bottom-right'
+      })
     }
   }
 
@@ -45,38 +38,51 @@ export default function Home () {
           formData.append('file', file)
           formData.append('email', employee.email)
 
-          try {
-            const response = await fetch('/api/send-receipt', {
+          toast.promise(
+            fetch('/api/send-receipt', {
               method: 'POST',
               body: formData
             })
-
-            if (!response.ok) {
-              console.error('Error al enviar el recibo:', response.statusText)
-            } else {
-              console.log(`Recibo enviado a ${employee.email}`)
+              .then(async (response) => {
+                if (!response.ok) {
+                  const errorMessage = await response.text()
+                  throw new Error(errorMessage || response.statusText)
+                }
+                return 'Recibo(s) enviado(s)'
+              }),
+            {
+              loading: 'Enviando recibo(s)...',
+              success: (message) => message,
+              // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+              error: (err) => `Error al enviar el recibo: ${err.message}`
             }
-          } catch (error) {
-            console.error('Error al enviar el recibo:', error)
-          }
+          )
         }
       }
     }
   }
 
   return (
-    <main className="grid grid-cols-[400px_auto] gap-8 w-full h-full items-center justify-items-center p-5">
-      <div>
-        <Title
-          title="CEFTY RECEIPT GUN"
-          subtitle="Please add here the receipts you want to deliver"
+    <main>
+      <div className="flex flex-col justify-center items-center min-h-screen">
+        <h1 className="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl py-5">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400 mr-3">
+            Receipt
+          </span>
+          GUN
+        </h1>
+        <ReceiptInput
+          handleFileChange={handleFileChange}
+          selectedFiles={selectedFiles}
         />
-        <ReceiptInput handleFileChange={handleFileChange} selectedFiles={selectedFiles}/>
-        <AddEmployeeForm refetchEmployees={fetchEmployees} />
-      </div>
-      <div>
-        <EmployeeList employees={employees}/>
-        <button onClick={handleSendReceipts}>SHOT</button>
+        <button
+          disabled={employees.length < 0}
+          className="shadow-md text-2xl bg-green-500 rounded-[50%] p-16 text-green-850 hover:bg-green-800 transition-all delay-50 hover:shadow-2xl hover:text-green-300"
+          onClick={handleSendReceipts}
+        >
+          Shot Receipts
+        </button>
+      <Footer className='justify-end w-full'/>
       </div>
     </main>
   )

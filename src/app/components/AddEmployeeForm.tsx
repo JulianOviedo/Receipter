@@ -2,12 +2,14 @@ import { EmployeeFormData } from '@/types'
 import { addEmployee } from '@/utils/CRUD/addEmployee'
 import React, { useState } from 'react'
 import { Title } from './Title'
+import toast from 'react-hot-toast'
 
 interface Props {
   refetchEmployees: () => Promise<void>
+  setShowModal: (value: boolean) => any
 }
 
-export const AddEmployeeForm: React.FC<Props> = ({ refetchEmployees }) => {
+export const AddEmployeeForm: React.FC<Props> = ({ refetchEmployees, setShowModal }) => {
   const [formData, setFormData] = useState<EmployeeFormData>({
     fullName: '',
     cuil: '',
@@ -26,21 +28,25 @@ export const AddEmployeeForm: React.FC<Props> = ({ refetchEmployees }) => {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
 
-    try {
-      await addEmployee(formData)
-      await refetchEmployees()
-      alert('Employee added successfully!')
-    } catch (error) {
-      console.log(error)
-      setError('Failed to add employee. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
+    await toast.promise(
+      (async () => {
+        await addEmployee(formData)
+        await refetchEmployees()
+      })(),
+      {
+        loading: 'Adding employee...',
+        success: 'Employee added successfully!',
+        error: 'Failed to add employee. Please try again.'
+      }
+    )
+
+    setIsSubmitting(false)
+    setShowModal(false)
   }
 
   return (
@@ -48,7 +54,7 @@ export const AddEmployeeForm: React.FC<Props> = ({ refetchEmployees }) => {
       onSubmit={handleSubmit}
       className="w-full flex flex-col items-center gap-5"
     >
-      <Title title='Add Employee' component='h2'/>
+      <Title title="Add Employee" component="h2" />
       <div className="w-full">
         <label
           htmlFor="fullName"
@@ -69,10 +75,10 @@ export const AddEmployeeForm: React.FC<Props> = ({ refetchEmployees }) => {
           htmlFor="cuil"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
-          Last Name
+          CUIL
         </label>
         <input
-          type='number'
+          type="number"
           id="cuil"
           value={formData.cuil}
           onChange={handleChange}
