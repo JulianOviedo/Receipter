@@ -9,7 +9,6 @@ interface Props {
 export const EmployeeList: React.FC<Props> = ({ employees }) => {
   return (
     <>
-      {employees.length === 0 && <SkeletonEmployees />}
       <div className="border-blue-900 border-2 rounded-md w-full mx-20 overflow-auto">
         <table className="w-full table-auto border-collapse">
           <thead className="bg-blue-300">
@@ -20,6 +19,7 @@ export const EmployeeList: React.FC<Props> = ({ employees }) => {
               <th className="px-4 py-2 text-center border-b-2 border-blue-900">Actions</th>
             </tr>
           </thead>
+          {employees.length === 0 && <SkeletonEmployees />}
           <tbody>
             {employees?.map(({ id, fullName, email, cuil }) => (
               <tr key={id} className="border-b border-blue-900 hover:bg-gray-100">
