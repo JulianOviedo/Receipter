@@ -6,6 +6,7 @@ import { EmployeeList } from '../components/EmployeeList'
 import { useEmployees } from '../context'
 import { getEmployees } from '@/utils/CRUD/getEmployees'
 import Footer from '../components/Footer'
+import Close from '../../../public/icons/Close'
 
 export default function Employees () {
   const [showModal, setShowModal] = useState<boolean>(false)
@@ -34,14 +35,14 @@ export default function Employees () {
                 refetchEmployees={refetchEmployees}
                 setShowModal={setShowModal}
               />
-            <button onClick={() => setShowModal(false)} className='absolute right-5 top-3 py-1 px-2 bg-red-400 rounded-[50%]'>x</button>
+            <button onClick={() => setShowModal(false)} className='absolute right-5 top-3 py-1 px-2  rounded-[50%]'><Close className='size-6'/></button>
             </div>
           </div>
           <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
         </>
       ) : null}
         <div className='w-full flex justify-center items-center'>
-      <EmployeeList employees={employees}/>
+      <EmployeeList employees={employees} refetchEmployees={refetchEmployees}/>
       </div>
       <Footer/>
     </main>
