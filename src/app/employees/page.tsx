@@ -35,16 +35,24 @@ export default function Employees () {
                 refetchEmployees={refetchEmployees}
                 setShowModal={setShowModal}
               />
-            <button onClick={() => setShowModal(false)} className='absolute right-5 top-3 py-1 px-2  rounded-[50%]'><Close className='size-6'/></button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="absolute right-5 top-3 py-1 px-2  rounded-[50%]"
+              >
+                <Close className="size-6" />
+              </button>
             </div>
           </div>
           <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
         </>
       ) : null}
-        <div className='w-full flex justify-center items-center'>
-      <EmployeeList employees={employees} refetchEmployees={refetchEmployees}/>
+      <div className="w-full flex justify-center items-center">
+        <EmployeeList
+          employees={employees}
+          refetchEmployees={refetchEmployees}
+        />
       </div>
-      <Footer/>
+      <Footer />
     </main>
   )
 }
