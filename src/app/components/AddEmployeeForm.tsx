@@ -18,7 +18,6 @@ export const AddEmployeeForm: React.FC<Props> = ({ refetchEmployees, setShowModa
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
@@ -31,20 +30,26 @@ export const AddEmployeeForm: React.FC<Props> = ({ refetchEmployees, setShowModa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setError(null)
-
-    await toast.promise(
-      (async () => {
-        await addEmployee(formData)
-        await refetchEmployees()
-      })(),
-      {
-        loading: 'Adding employee...',
-        success: 'Employee added successfully!',
-        error: 'Failed to add employee. Please try again.'
-      }
-    )
-
+    try {
+      await toast.promise(
+        (async () => {
+          await addEmployee(formData)
+          await refetchEmployees()
+        })(),
+        {
+          loading: 'Adding employee...',
+          success: 'Employee added successfully!',
+          error: (err) => {
+            console.error('Error caught in toast.promise:', err)
+            return err instanceof Error
+              ? err.message
+              : 'Failed to add employee. Please try again.'
+          }
+        }
+      )
+    } catch (error) {
+      console.log(error)
+    }
     setIsSubmitting(false)
     setShowModal(false)
   }
@@ -118,7 +123,6 @@ export const AddEmployeeForm: React.FC<Props> = ({ refetchEmployees, setShowModa
           required
         />
       </div>
-      {error && <p className="text-red-500">{error}</p>}
       <button
         type="submit"
         disabled={isSubmitting}

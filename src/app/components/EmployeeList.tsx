@@ -26,11 +26,9 @@ export const EmployeeList: React.FC<Props> = ({ employees, refetchEmployees }) =
         {
           loading: 'Deleting employee...',
           success: 'Employee deleted successfully!',
-          error: 'Failed to delete employee. Please try again.'
+          error: (err) => err || 'Failed to delete employee. Please try again.'
         }
       )
-    } else {
-      console.error('Email is null or undefined')
     }
   }
 

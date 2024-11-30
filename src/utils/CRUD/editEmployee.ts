@@ -2,20 +2,41 @@ import { EmployeeFormData } from '@/types'
 
 export const editEmployee = async (employee: EmployeeFormData): Promise<Response> => {
   try {
-    const response = await fetch('http://localhost:3000/api/edit-employee', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(employee)
-    })
+    const { id, email, fullName, cuil, legajo } = employee
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.error || 'Failed to edit employee')
+    if (!id) {
+      throw new Error('Id is missing')
     }
 
-    return response
+    const existingEmployee = await prisma.employee.findFirst({
+      where: {
+        OR: [
+          { email },
+          { legajo }
+        ],
+        NOT: {
+          id
+        }
+      }
+    })
+
+    if (existingEmployee) {
+      throw new Error('Email or Legajo already exists')
+    }
+
+    const updateUser = await prisma.employee.update({
+      where: {
+        id
+      },
+      data: {
+        email,
+        fullName,
+        cuil,
+        legajo
+      }
+    })
+
+    return updateUser
   } catch (error) {
     console.error('Error editing employee:', error)
     throw error

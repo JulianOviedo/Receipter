@@ -31,7 +31,7 @@ const Header: React.FC<Props> = ({ logo, company = 'Test' }) => {
 
         <nav>
             {NAV_LINKS.map(({ link, path }) => (
-                <Link href={path}>{link}</Link>
+                <Link href={path} key={link}>{link}</Link>
             ))}
         </nav>
     </header>
